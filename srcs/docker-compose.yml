@@ -10,4 +10,8 @@ services:
       - ./requirements/nginx/log:/var/log/nginx
       - ./requirements/conf/nginx.conf:/etc/nginx/conf.d
     ports:
-      - "127.0.0.1:80:80"
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - ./home/nlorion/data/:/etc/nginx/conf.d/:ro
