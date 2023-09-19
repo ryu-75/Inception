@@ -3,7 +3,6 @@ COMPOSE		= ./srcs/docker-compose.yml
 # DOMAINE		= nlorion.42.fr
 
 folder		:
-				mkdir -p ./home/nlorion
 				mkdir -p ${PATH}
 
 wordpress	:
@@ -15,14 +14,14 @@ nginx		:
 mariadb		:
 				mkdir -p ${PATH}/mariadb
 
-start		: 
-				sudo docker-compose -f $(COMPOSE) start
-stop		: 
-				sudo docker-compose -f $(COMPOSE) stop
+# start		: 
+# 				sudo docker-compose -f $(COMPOSE) start
+# stop		: 
+# 				sudo docker-compose -f $(COMPOSE) stop
 
-all			: start
-				mkdir -p ./home
+all			: folder
 
-clean		: stop 
+clean		:
+				sudo rm -rf ${PATH}
 
 .PHONY		= all folder wordpress mariadb nginx start stop clean
