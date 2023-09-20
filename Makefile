@@ -1,27 +1,36 @@
-PATH		= ./home/nlorion/data
+# PATH		= ./home/nlorion/data
 COMPOSE		= ./srcs/docker-compose.yml
+IMAGES		= ./srcs/requirements
+APP_NAME	= inception
+
+build		:
+				sudo docker build ${IMAGES}/nginx
+
 # DOMAINE		= nlorion.42.fr
 
-folder		:
-				mkdir -p ${PATH}
+# CREATE FOLDERS
+# folder		:
+# 				mkdir -p ${PATH}
 
-wordpress	:
-				mkdir -p ${PATH}/wordpress
+# wordpress	:
+# 				mkdir -p ${PATH}/wordpress
 
-nginx		:
-				mkdir -p ${PATH}/nginx
+# nginx		:
+# 				mkdir -p ${PATH}/nginx
 
-mariadb		:
-				mkdir -p ${PATH}/mariadb
+# mariadb		:
+# 				mkdir -p ${PATH}/mariadb
 
 # start		: 
 # 				sudo docker-compose -f $(COMPOSE) start
 # stop		: 
 # 				sudo docker-compose -f $(COMPOSE) stop
 
-all			: folder
+all			: build
 
 clean		:
-				sudo rm -rf ${PATH}
+				sudo docker stop nginx
+				sudo rm -r ${IMAGES}/nginx/log && \
+				sudo rm -r ${IMAGES}/nginx/www
 
-.PHONY		= all folder wordpress mariadb nginx start stop clean
+.PHONY		: all build clean start
