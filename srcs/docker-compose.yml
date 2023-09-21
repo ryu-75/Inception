@@ -3,13 +3,10 @@ version: '3.7'
 services:
   nginx:
     container_name: nginx
-    build: ./requirements/nginx
+    build:
+      context : requirements/nginx
+      dockerfile: ./Dockerfile
     image: nginx:inception
     ports:
       - "443:443"
-    volumes:
-      - ./:/app
-      - ./requirements/nginx/www:/usr/share/nginx/html:ro
-      - ./requirements/nginx/log:/var/log/nginx
-      - ./requirements/nginx/conf/nginx.conf:/etc/nginx/conf.d
     restart: always

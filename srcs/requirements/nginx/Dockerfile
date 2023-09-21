@@ -1,6 +1,6 @@
 FROM  alpine:3.17
 
-WORKDIR /srcs/requirements/nginx
+WORKDIR /requirements/nginx
 
 RUN apk update && apk upgrade \
         && apk add nginx \
@@ -8,9 +8,16 @@ RUN apk update && apk upgrade \
 
 COPY ./conf/nginx.conf /etc/nginx/conf/nginx.conf
 
-RUN adduser -D -g 'www' www \
-        && chown -R www:www /var/www/html \
-        && chown -R www:www /www
+# RUN vi /var/www/html/index.html \
+#         && echo "<h1>Bonjour tout le monde !</h1>" > /var/www/index.html;
+
+RUN apk run curl \
+        && curl localhost
+
+
+# RUN adduser -D -g 'www' www \
+#         && chown -R www:www /var/www/html \
+#         && chown -R www:www www
 
 ENTRYPOINT ["nginx"]
 
