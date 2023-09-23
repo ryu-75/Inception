@@ -1,38 +1,29 @@
-# PATH		= /home/nlorion/
-LOGIN		= nlorion
-COMPOSE		= ./srcs/docker-compose.yml
-IMAGES		= ./srcs/requirements
-APP_NAME	= inception
+PATH		= 	/home/nlorion
+LOGIN		= 	nlorion
+IMAGES		= 	./srcs/requirements
+# DOMAINE		= nlorion.42.fr
 
-<<<<<<< HEAD
-start		:
-				docker-compose -f $(COMPOSE) start
-stop		:
-				docker-compose -f $(COMPOSE) stop
-=======
 setup		:
 				sudo mkdir -p /home/${LOGIN}/
-				sudo mkdir -p /home/${LOGIN}/mariadb/
-				sudo mkdir -p /home/${LOGIN}/wordpress/
->>>>>>> df71c35ef31941057e185c3778074d3594b7e405
+				sudo mkdir -p ${PATH}/mariadb/
+				sudo mkdir -p ${PATH}/wordpress/
 
-up		:	setup
-			sudo docker-compose up ${COMPOSE} 
+up			:	setup
+				docker-compose ./srcs/docker-compose.yml up -d
 
-<<<<<<< HEAD
-clean		: stop
+stop		:
+				sudo docker stop nginx
 
-.PHONY		= all start stop clean
-=======
 build		:
 				sudo docker build ${IMAGES}/nginx
 
-# DOMAINE		= nlorion.42.fr
-
-all			: up
+all			:	up
 
 clean		:
-				sudo rm -rf /home/${LOGIN}
+				sudo rm -rf ${PATH}/mariadb
+				sudo rm -rf ${PATH}/wordpress
 
-.PHONY		: all build clean start setup
->>>>>>> df71c35ef31941057e185c3778074d3594b7e405
+fclean		: 	clean
+				sudo rm -rf ${PATH}
+
+.PHONY		: 	all setup up build stop clean fclean
