@@ -1,13 +1,13 @@
 # PATH		= ./home/nlorion/data
 COMPOSE		= ./srcs/docker-compose.yml
 
-start		: 
-				sudo docker-compose -f $(COMPOSE) start
-stop		: 
-				sudo docker-compose -f $(COMPOSE) stop
+start		:
+				docker-compose -f $(COMPOSE) start
+stop		:
+				docker-compose -f $(COMPOSE) stop
 
 all			: start
 
-clean		: stop 
+clean		: stop
 
 .PHONY		= all start stop clean
