@@ -1,13 +1,12 @@
-version: '3'
+version: '3.7'
 
 services:
   nginx:
-    image: alpine:3.17
     container_name: nginx
-    volumes:
-      - .:/app
-      - ./requirements/nginx/www:/usr/share/nginx/html:ro
-      - ./requirements/nginx/log:/var/log/nginx
-      - ./requirements/conf/nginx.conf:/etc/nginx/conf.d
+    build:
+      context : requirements/nginx
+      dockerfile: ./Dockerfile
+    image: nginx:inception
     ports:
-      - "127.0.0.1:80:80"
+      - "443:443"
+    restart: always
