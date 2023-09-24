@@ -1,29 +1,24 @@
-PATH		= 	/home/nlorion
-LOGIN		= 	nlorion
-IMAGES		= 	./srcs/requirements
-# DOMAINE		= nlorion.42.fr
+setup			:
+					sudo mkdir /home/nlorion
+					sudo mkdir /home/nlorion/data
+					sudo mkdir /home/nlorion/data/wordpress-data
+					sudo mkdir /home/nlorion/data/mariadb-data
 
-setup		:
-				sudo mkdir -p /home/${LOGIN}/
-				sudo mkdir -p ${PATH}/mariadb/
-				sudo mkdir -p ${PATH}/wordpress/
+up				:	setup
+					docker-compose -f ./srcs/docker-compose.yml up -d --build
 
-up			:	setup
-				docker-compose ./srcs/docker-compose.yml up -d
+all				: up
 
-stop		:
-				sudo docker stop nginx
+stop			:
+					docker-compose -f ./srcs/docker-compose.yml stop
 
-build		:
-				sudo docker build ${IMAGES}/nginx
+start			:
+					docker-compose -f ./srcs/docker-compose.yml start
 
-all			:	up
+clear			:
+					sudo rm -rf /home/nlorion/data/
 
-clean		:
-				sudo rm -rf ${PATH}/mariadb
-				sudo rm -rf ${PATH}/wordpress
+fclear			: clear
+					sudo rm -rf /home/nlorion
 
-fclean		: 	clean
-				sudo rm -rf ${PATH}
-
-.PHONY		: 	all setup up build stop clean fclean
+.PHONY			: all setup up start stop clear fclear
