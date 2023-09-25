@@ -4,7 +4,7 @@ services:
   nginx:
     container_name: nginx
     build:
-      context : requirements/nginx
+      context : requirements/nginx/
       dockerfile: ./Dockerfile
     image: nginx:inception
     env_file: .env
@@ -17,6 +17,7 @@ services:
       - wordpress-data:/var/www/html/
     depends_on:
       - wordpress
+
   wordpress:
     container_name : wordpress
     build:
@@ -29,6 +30,21 @@ services:
     restart: on-failure
     volumes:
       - wordpress-data:/var/www/html/
+    depends_on:
+      - mariadb
+  
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb/
+      dockerfile: ./Dockerfile
+    image: mariadb:inception
+    env_file: .env
+    networks:
+      - inception
+    restart: on-failure
+    volumes:
+      - mariadb-data:/app/
 
 volumes:
   wordpress-data:
@@ -37,6 +53,12 @@ volumes:
       type : 'none'
       o: 'bind'
       device: ${DATA_PATH}/wordpress-data
+  mariadb-data:
+    driver: local
+    driver_opts:
+      type : 'none'
+      o: 'bind'
+      device: ${DATA_PATH}/mariadb-data
 
 networks:
   inception:
