@@ -8,7 +8,8 @@ services:
       dockerfile: ./Dockerfile
     image: nginx:inception
     env_file: .env
-    networks: inception
+    networks:
+      - inception
     ports:
       - "443:443"
     restart: on-failure
@@ -23,15 +24,11 @@ services:
       dockerfile: ./Dockerfile
     image: wordpress:inception
     env_file: .env
-    networks: inception
+    networks: 
+      - inception
     restart: on-failure
     volumes:
       - wordpress-data:/var/www/html/
-
-networks:
-  inception:
-    name: inception
-    driver: bridge
 
 volumes:
   wordpress-data:
@@ -40,3 +37,8 @@ volumes:
       type : 'none'
       o: 'bind'
       device: ${DATA_PATH}/wordpress-data
+
+networks:
+  inception:
+    name: inception
+    driver: bridge
