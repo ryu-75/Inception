@@ -5,7 +5,6 @@ RUN		apk add curl && \
 		curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
 		chmod +x wp-cli.phar && \
 		mv wp-cli.phar /usr/bin/wp-cli.phar
-		# wordpress --info
 
 # Installation des dependances de PHP 8.1 & MariaDB-client
 RUN		apk update && apk upgrade && \

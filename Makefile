@@ -1,10 +1,11 @@
 LOGIN			= nlorion
 DATA_PATH		= /home/${LOGIN}/data
+ENV				= LOGIN=${LOGIN} DATA_PATH=${DATA_PATH} DOMAIN=${LOGIN}.42.fr
 
 all				: up
 
 up				:	setup
-					sudo docker compose -f srcs/docker-compose.yml up -d --build
+					sudo ${ENV} docker compose -f srcs/docker-compose.yml up -d --build
 
 setup			:
 					sudo mkdir /home/${LOGIN}
@@ -13,10 +14,13 @@ setup			:
 					sudo mkdir ${DATA_PATH}/mariadb-data
 
 stop			:
-					sudo docker compose -f srcs/docker-compose.yml stop
+					sudo ${ENV} docker compose -f srcs/docker-compose.yml stop
+
+down			:
+					sudo ${ENV} docker compose -f ./srcs/docker-compose.yml down
 
 start			:
-					sudo docker compose -f srcs/docker-compose.yml start
+					sudo ${ENV} docker compose -f srcs/docker-compose.yml start
 
 delete			:
 					sudo docker system prune --volumes --all
@@ -27,4 +31,4 @@ clear			: delete
 fclear			: clear
 					sudo rm -rf /home/nlorion
 
-.PHONY			: all setup up start delete stop clear fclear
+.PHONY			: all setup up start down delete stop clear fclear

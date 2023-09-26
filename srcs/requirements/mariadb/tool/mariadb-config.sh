@@ -1,38 +1,49 @@
 #!/bin/sh
 
+echo "[ MySQL ] Configuring MariaDB"
+
 if [ ! -d "/run/mysqld" ]; then
   mkdir -p /run/mysqld
+  chown -R mysql:mysql /run/mysqld
 fi
 
-if [ -d /app/mysql ]; then
+if [ -d "/var/lib/mysql/mysql" ];
+then
   echo "[i] MySQL directory already present, skipping creation"
 else
   echo "[i] MySQL data directory not found, creating initial DBs"
+  chown -R mysql:mysql /var/lib/mysql
+  mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql > /dev/null
+  echo "[i] MySQL data directory is created now"
 
-  mysql_install_db --user=root --basedir=/etc/mysql --datadir=/etc/mysql/data > /dev/null
-
+  echo "[i] Verify if root Password exist"
   if [ "${DB_ROOT_PASS}" = "" ]; then
     ${DB_ROOT_PASS}=root
     echo "[i] MySQL root Password: ${DB_ROOT_PASS}"
   fi
 
-  DB_DATABASE=${DB_DATABASE:-""}
-  DB_USER=${DB_USER:-""}
-  DB_PASS=${DB_PASS:-""}
-
-  TMP=/etc/tmp
-  if [ ! -f ${TMP} ]; then
+  echo "[ MySQL ] Configuring database"
+  tfile=/tmp/.tfile
+  if [ ! -f $tfile ]; then
       return 1
   fi
 
-  echo "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\` CHARACTER SET utf8 COLLATE utf8_general_ci;" >> ${TMP}
-  echo "CREATE USER ${DB_USER} IDENTIFIED BY PASSWORD ${DB_PASS};" >> ${TMP}
-  echo "USE ${DB_DATABASE};" >> ${TMP};
-  echo "FLUSH PRIVILEGES;" >> ${TMP};
-  echo "GRANT ALL PRIVILEGES ON ${DB_DATABASE} TO ${DB_USER}.* IDENTIFIED BY "${DB_ROOT_PASS}" WITH GRANT OPTION;" >> ${TMP}
-  echo "GRANT ALL PRIVILEGES ON ${DB_DATABASE} TO '${NGIN_HOST}' WITH GRANT OPTION;" >> ${TMP}
-  echo "ALTER USER '${NGINX_HOST}' IDENTIFIED BY '${DB_USER}';" >> ${TMP}
+  echo "USE mysql;" > $tfile
+  echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';" >> $tfile
+  echo "CREATE DATABASE ${WP_DB_NAME};" >> $tfile
+  echo "CREATE USER '${WP_DB_USER}'@'%' IDENTIFIED BY PASSWORD '${WP_DB_PASS}';" >> $tfile
+  echo "GRANT ALL PRIVILEGES ON ${WP_DB_NAME}.* TO '${WP_DB_USER}'@'%' IDENTIFIED BY '${WP_DB_PASS}';" >> $tfile
+  echo "FLUSH PRIVILEGES;" >> $tfile
 
   /usr/bin/mysqld --user=root --bootstrap --verbose=0 < $tfile
   rm -f $tfile
+
+  echo "[ MySQL ] Configuration done"
 fi
+
+echo "[ MySQL ] database connect to MariaDB"
+sed -i "s|.*skip-networking.*|skip-networking|g" /etc/mysql/my.cnf
+sed -i "s|.*skip-networking.*|skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf
+
+echo "[ MySQL ] Starting MariaDB on port 3306"
+exec /usr/bin/mysqld --user=mysql --console

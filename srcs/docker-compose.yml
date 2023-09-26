@@ -25,14 +25,14 @@ services:
       dockerfile: ./Dockerfile
     image: wordpress:inception
     env_file: .env
-    networks: 
+    networks:
       - inception
     restart: on-failure
     volumes:
       - wordpress-data:/var/www/html/
     depends_on:
       - mariadb
-  
+
   mariadb:
     container_name: mariadb
     build:
@@ -44,7 +44,7 @@ services:
       - inception
     restart: on-failure
     volumes:
-      - mariadb-data:/app/
+      - mariadb-data:/var/lib/mysql/
 
 volumes:
   wordpress-data:
