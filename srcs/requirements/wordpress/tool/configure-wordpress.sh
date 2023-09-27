@@ -62,7 +62,7 @@ else
     echo "MariaDB accessible."
 
     echo "Creating database configuration file..."
-    if [ -f ${WP_PATH}/wp-config.php ]
+    if [ -f /var/www/html/wordpress/wp-config.php ]
     then
         echo "Wordpress is already configured."
     else

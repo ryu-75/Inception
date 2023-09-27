@@ -10,7 +10,6 @@ RUN		chmod +x /tmp/mariadb-config.sh
 
 COPY    ./conf/mariadb.conf /etc/mysql/mariadb.conf
 
-
 EXPOSE  3306
 
 # Lancement des configurations des scripts MariaDB entant que point d'entree

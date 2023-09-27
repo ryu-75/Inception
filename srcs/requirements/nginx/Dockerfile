@@ -1,12 +1,14 @@
 FROM    alpine:3.17
 
 #NGINX
-RUN     apk update && apk upgrade && \
-        apk add nginx && \
-        mkdir -p /var/www/html/
+RUN     apk update && apk upgrade && apk add nginx
+
+RUN     adduser -D -g 'www' www &&\
+        mkdir -p /var/www/html/ &&\
+        chown -R www:www /run/nginx/ &&\
+        chown -R www:www /var/www/html/
 
 COPY    ./conf/nginx.conf /etc/nginx/conf/nginx.conf
-COPY    ./conf/default.conf /etc/nginx/http.d/default.conf
 
 #OPENSSL
 RUN     apk add openssl && \
@@ -15,11 +17,7 @@ RUN     apk add openssl && \
         /etc/ssl/certs/nginx-selfsigned.crt -sha256 -days 365 \
         -nodes -subj "/C=FR/ST=IDF/L=Paris/O=42Network/OU=42Paris/CN=nginx_host_example"
 
-RUN adduser -D -g 'www' www &&\
-        chown -R www:www /run/nginx/ &&\
-        chown -R www:www /var/www/html/
-
-EXPOSE 443/tcp
+EXPOSE  443/tcp
 
 ENTRYPOINT ["nginx"]
 CMD ["-g", "daemon off"]

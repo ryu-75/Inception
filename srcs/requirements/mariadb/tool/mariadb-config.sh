@@ -2,7 +2,8 @@
 
 echo "[ MySQL ] Configuring MariaDB"
 
-if [ ! -d "/run/mysqld" ]; then
+if [ ! -d "/run/mysqld" ]; 
+then
   mkdir -p /run/mysqld
   chown -R mysql:mysql /run/mysqld
 fi
@@ -12,19 +13,14 @@ then
   echo "[i] MySQL directory already present, skipping creation"
 else
   echo "[i] MySQL data directory not found, creating initial DBs"
-  chown -R mysql:mysql /var/lib/mysql
+  chown -R mysql:mysql /var/lib/mysql/
   mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql > /dev/null
   echo "[i] MySQL data directory is created now"
 
-  echo "[i] Verify if root Password exist"
-  if [ "${DB_ROOT_PASS}" = "" ]; then
-    ${DB_ROOT_PASS}=root
-    echo "[i] MySQL root Password: ${DB_ROOT_PASS}"
-  fi
-
   echo "[ MySQL ] Configuring database"
   tfile=/tmp/.tfile
-  if [ ! -f $tfile ]; then
+  if [ ! -f $tfile ];
+  then
       return 1
   fi
 
@@ -42,8 +38,8 @@ else
 fi
 
 echo "[ MySQL ] database connect to MariaDB"
-sed -i "s|.*skip-networking.*|skip-networking|g" /etc/mysql/my.cnf
-sed -i "s|.*skip-networking.*|skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf
+sed -i "s|.*skip-networking.*|skip-networking|g" /etc/mysql/mariadb.conf
+# sed -i "s|.*skip-networking.*|skip-networking|g" /etc/mysql/my.cnf.d/mariadb-server.cnf
 
 echo "[ MySQL ] Starting MariaDB on port 3306"
-exec /usr/bin/mysqld --user=mysql --console
+exec /run/mysqld --user=mysql --console

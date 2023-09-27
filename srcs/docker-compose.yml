@@ -18,6 +18,19 @@ services:
     depends_on:
       - wordpress
 
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb/
+      dockerfile: ./Dockerfile
+    image: mariadb:inception
+    env_file: .env
+    networks:
+      - inception
+    restart: on-failure
+    volumes:
+      - mariadb-data:/var/lib/mysql/
+
   wordpress:
     container_name : wordpress
     build:
@@ -33,32 +46,19 @@ services:
     depends_on:
       - mariadb
 
-  mariadb:
-    container_name: mariadb
-    build:
-      context: ./requirements/mariadb/
-      dockerfile: ./Dockerfile
-    image: mariadb:inception
-    env_file: .env
-    networks:
-      - inception
-    restart: on-failure
-    volumes:
-      - mariadb-data:/var/lib/mysql/
-
 volumes:
-  wordpress-data:
-    driver: local
-    driver_opts:
-      type : 'none'
-      o: 'bind'
-      device: ${DATA_PATH}/wordpress-data
   mariadb-data:
     driver: local
     driver_opts:
       type : 'none'
       o: 'bind'
       device: ${DATA_PATH}/mariadb-data
+  wordpress-data:
+    driver: local
+    driver_opts:
+      type : 'none'
+      o: 'bind'
+      device: ${DATA_PATH}/wordpress-data
 
 networks:
   inception:
