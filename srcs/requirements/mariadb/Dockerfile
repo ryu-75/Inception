@@ -2,7 +2,8 @@ FROM	alpine:3.17
 
 # Installation de MariaDB
 RUN     apk update && apk upgrade &&\
-		apk add mariadb mariadb-client
+		apk add mariadb mariadb-client &&\
+		apk add --upgrade mysql-client
 
 # Copie les fichiers de configuration de MariaDB
 COPY    ./tool/mariadb-config.sh /tmp/mariadb-config.sh

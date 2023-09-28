@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -euo pipefail
+
 echo "[ MySQL ] Configuring MariaDB"
 
 if [ ! -d "/run/mysqld" ]; 
@@ -38,8 +40,8 @@ else
 fi
 
 echo "[ MySQL ] database connect to MariaDB"
-sed -i "s|.*skip-networking.*|skip-networking|g" /etc/mysql/mariadb.conf
-# sed -i "s|.*skip-networking.*|skip-networking|g" /etc/mysql/my.cnf.d/mariadb-server.cnf
+sed -i "s|.*skip-networking.*|skip-networking|g" /etc/my.cnf
+sed -i "s|.*skip-networking.*|skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf
 
 echo "[ MySQL ] Starting MariaDB on port 3306"
-exec /run/mysqld --user=mysql --console
+exec /usr/bin/mysqld/ --user=mysql --console
