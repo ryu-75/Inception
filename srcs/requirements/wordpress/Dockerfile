@@ -1,31 +1,32 @@
 FROM	alpine:3.17
 
-#Installation WP-Cli
-RUN		apk add curl && \
-		curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
-		chmod +x wp-cli.phar && \
-		mv wp-cli.phar /usr/bin/wp-cli.phar
-
 # Installation des dependances de PHP 8.1 & MariaDB-client
 RUN		apk update && apk upgrade && \
-		apk add php81 php81-fpm \
+		apk add --no-cache \
+				wget \
+				curl \
+				mariadb-client \
+				php81 php81-fpm \
+				php-mysqli \
 				argon2-libs \
 				libedit \
 				libxml2 \
 				musl \
 				pcre2 \
 				php81-common \
-				zlib && \
-		apk add mariadb-client
+				zlib
 
 # Configure PHP-fpm pour ecouter sur le port reseau de creation interne 9000
-RUN		sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /etc/php81/php-fpm.d/www.conf
-
+COPY		conf/www.conf /etc/php81/php-fpm.d/www.conf
+COPY 		/src/wp-config.php /var/www/html/wordpress/wp-config.php
 # Copie du fichier de configuration Wordpress
-COPY 	./tool/configure-wordpress.sh /tmp/configure-wordpress.sh
-RUN		chmod +x /tmp/configure-wordpress.sh
+COPY 	entrypoint.sh tool/configure-wordpress.sh /tmp/
+RUN		chmod +x /tmp/entrypoint.sh /tmp/configure-wordpress.sh
 
-WORKDIR	/var/www/html/wordpress
+RUN 	mkdir /tmp/src
+COPY	src /tmp/src
+
+EXPOSE	9000
 
 # Lance le fichier de configuration Wordpress au demarrage du conteneur
-ENTRYPOINT [ "sh", "/tmp/configure-wordpress.sh" ]
+ENTRYPOINT [ "/tmp/entrypoint.sh" ]

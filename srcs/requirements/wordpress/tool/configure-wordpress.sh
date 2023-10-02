@@ -1,92 +1,79 @@
 #!/bin/bash
 
-clear
-echo "========================================"
-echo "        Wordpress Install Script        "
-echo "========================================"
-echo
-echo "========================================"
-echo "          Database details              "
-echo "========================================"
-echo
-
-echo -n "Database Host (e.g localhost) : "
-read dbhost
-
-echo -n "Database Name : "
-read dbname
-
-echo -n "Database User: "
-read dbuser
-
-echo -n "Database Password :"
-read dbwpass
-echo
+set -euo pipefail
 
 echo "========================================"
-echo "              Admin details             "
+echo "          Installing Wordpress          "
 echo "========================================"
-echo
+echo "Waiting for MariaDB..."
+timeout=100
+while ! mariadb -h$DB_HOST -u$DB_USER -p$DB_PASS $DB_DATABASE &>/dev/null;
+do
+    timeout=$((timeout - 1))
+    test "$timeout" = 0 && echo "MariaDB timeout." && exit 1
+    sleep 3
+done
 
-echo -n "Site url : "
-read siteurl
+echo "MariaDB accessible."
+WP_PATH = /var/www/html/wordpress
 
-echo -n "Site Name (e.g nlorion) : "
-read sitename
-
-echo -n "Email Address : "
-read wpemail
-
-echo -n "Admin User Name : "
-read wpuser
-
-echo -n "Admin User Password : "
-read wppass
-
-echo -n "run install ? (y/n) : "
-read run
-
-if [ "$run" == n ] ;
+echo "Creating database configuration file..."
+if [ -f $WP_PATH/wp-config.php ];
 then
-    exit
+    echo "Wordpress is already configured."
 else
-    echo "========================================"
-    echo "          Installing Wordpress          "
-    echo "========================================"
+    echo "Installing worpress..."
+    echo "Updating WP-CLI..."
+    wp cli update \
+                --yes \
+                --allow-root
 
-    echo "Waiting for MariaDB..."
-    while ! mariadb -h${DB_HOST} -u${WP_DB_USER} -p${WP_DB_PASS} ${WP_DB_NAME} &>/dev/null
-    do
-        sleep 3
-    done
-    echo "MariaDB accessible."
+    echo "Downloading wordpress..."
+    wp core download \
+                --allow-root
 
-    PATH = /var/www/html/wordpress
+    echo "Creating wp-config.php..."
+    wp config create \
+                --dbname=$DB_NAME \
+                --dbuser=$DB_USER \
+                --dbpass=$DB_PASS \
+                --dbhost=$DB_HOST:3306 \
+                --path=$WP_PATH \
+                --allow-root
 
-    echo "Creating database configuration file..."
-    if [ -f ${PATH}/wp-config.php ]
-    then
-        echo "Wordpress is already configured."
-    else
-        echo "Installing worpress..."
-        echo "Updating WP-CLI..."
-        wp-cli.phar cli update --yes --allow-root
-        echo "Downloading wordpress..."
-        wp-cli.phar core download --allow-root
-        echo "Creating wp-config.php..."
-        wp-cli.phar config create --dbname=${WP_DB_NAME} --dbuser=${WP_DB_USER} --dbpass=${WP_DB_PASS} --dbhost=${DB_HOST} --path=${WP_PATH} --allow-root
-        echo "Installing wordpress core..."
-        wp-cli.phar core install --url="${NGINX_HOST}/wordpress" --title=${WP_TITLE} --admin_user=${WP_ADMIN_USER} --admin_password=${WP_ADMIN_PASS} --admin_email=${WP_ADMIN_EMAIL} --path=${WP_PATH} --allow-root
-        echo "Creating wordpress default user..."
-        wp-cli.phar user create ${WP_USER} ${WP_USER_MAIL} --user_pass=${WP_USER_PASS} --role=subscriber --display_name=${WP_USER} --porcelain --path=${WP_PATH} --allow-root
-        echo "Installing wordpress theme..."
-        wp-cli.phar theme install the-bootstrap-blog --path=${WP_PATH} --activate --allow-root
-        wp-cli.phar theme status the-bootstrap-blog --allow-root
-    fi
+    echo "Installing wordpress core..."
+    wp core install \
+                --url=$NGINX_HOST \
+                --title=$WP_TITLE \
+                --admin_user=$WP_ADMIN_NAME \
+                --admin_email=$WP_ADMIN_MAIL \
+                --admin_password=$WP_ADMIN_PASS \
+                --path=$WP_PATH \
+                --skip_email \
+                --allow-root
 
-    echo
-    echo "Starting wordpress fastCGI on port 9000"
-    exec /usr/sbin/php-fpm81 -F -R
+    echo "Creating wordpress default user..."
+    wp user create \
+                --user_pass=$WP_USER_PASS \
+                --display_name=$WP_USER \
+                --path=$WP_PATH \
+                --role=author $WP_USER_NAME $WP_USER_MAIL\
+                --porcelain \
+                --allow-root
+
+    echo "Installing wordpress theme..."
+    wp theme install the-bootstrap-blog \
+                --path=$WP_PATH \
+                --activate \
+                --allow-root
+
+    wp theme status the-bootstrap-blog \
+                --allow-root
+fi
+
+if [ ! -d /run/php ];
+then
+    mkdir /run/php;
 fi
 
 echo "========================================"
