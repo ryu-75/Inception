@@ -5,16 +5,16 @@ set -euo pipefail
 echo "========================================"
 echo "          Installing Wordpress          "
 echo "========================================"
-echo "Waiting for MariaDB..."
-timeout=100
-while ! mariadb -h$DB_HOST -u$DB_USER -p$DB_PASS $DB_DATABASE &>/dev/null;
-do
-    timeout=$((timeout - 1))
-    test "$timeout" = 0 && echo "MariaDB timeout." && exit 1
-    sleep 3
-done
+# echo "Waiting for MariaDB..."
+# timeout=100
+# while ! mariadb -h$DB_HOST -u$DB_USER -p$DB_PASS $DB_DATABASE &>/dev/null;
+# do
+#     timeout=$((timeout - 1))
+#     test "$timeout" = 0 && echo "MariaDB timeout." && exit 1
+#     sleep 3
+# done
 
-echo "MariaDB accessible."
+# echo "MariaDB accessible."
 WP_PATH = /var/www/html/wordpress
 
 echo "Creating database configuration file..."
@@ -75,6 +75,8 @@ if [ ! -d /run/php ];
 then
     mkdir /run/php;
 fi
+
+touch /home/log.txt | ls -la /var/www/html/* > /home/log.txt
 
 echo "========================================"
 echo "      Installation is complete.           "

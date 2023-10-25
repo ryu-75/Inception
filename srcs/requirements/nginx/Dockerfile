@@ -19,7 +19,7 @@ RUN     openssl req -x509 -nodes -newkey rsa:4096 \
 
 EXPOSE  443/tcp
 
-STOPSIGNAL SIGTERM
+# STOPSIGNAL SIGTERM
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

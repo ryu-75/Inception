@@ -17,16 +17,17 @@ RUN		apk update && apk upgrade && \
 				zlib
 
 # Configure PHP-fpm pour ecouter sur le port reseau de creation interne 9000
-COPY		conf/www.conf /etc/php81/php-fpm.d/www.conf
-COPY 		/src/wp-config.php /var/www/html/wordpress/wp-config.php
-# Copie du fichier de configuration Wordpress
-COPY 	entrypoint.sh tool/configure-wordpress.sh /tmp/
-RUN		chmod +x /tmp/entrypoint.sh /tmp/configure-wordpress.sh
+COPY		conf/www.conf ./etc/php81/php-fpm.d/
+COPY 		./src/wp-config.php ./var/www/html/wordpress
 
-RUN 	mkdir /tmp/src
-COPY	src /tmp/src
+# Copie du fichier de configuration Wordpress
+COPY	./tool/configure-wordpress.sh ./tmp/
+# RUN		chmod +x ./tmp/entrypoint.sh
+RUN		chmod +x ./tmp/configure-wordpress.sh
+
+COPY	./src/* ./tmp/src/.
 
 EXPOSE	9000
 
 # Lance le fichier de configuration Wordpress au demarrage du conteneur
-ENTRYPOINT [ "/tmp/entrypoint.sh" ]
+ENTRYPOINT [ "tmp/entrypoint.sh" ]

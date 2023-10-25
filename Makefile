@@ -1,5 +1,5 @@
 LOGIN			= 	nlorion
-DATA_PATH		= 	/home/nlorion/Desktop/${LOGIN}
+DATA_PATH		= 	/home/${LOGIN}
 
 all				: 	up
 

@@ -12,13 +12,14 @@ RUN     apk update && apk upgrade &&\
 		apk add --upgrade mysql-client
 
 # Copie les fichiers de configuration de MariaDB
-COPY    ./conf/mariadb-server.cnf /etc/mysql/my.cnf.d
+COPY    conf/mariadb-server.cnf etc/mysql/my.cnf.d
 
 # Importation du script d'initialisation
-COPY    ./tool/mariadb-config.sh entrypoint.sh /tmp/
-RUN		chmod +x  /tmp/entrypoint.sh
+COPY    tool/mariadb-config.sh entrypoint.sh tmp/
+RUN		chmod +x  tmp/entrypoint.sh
 
 EXPOSE	3306
 
 # Lancement des configurations des scripts MariaDB entant que point d'entree
-ENTRYPOINT [ "/tmp/entrypoint.sh" ]
+ENTRYPOINT [ "tmp/entrypoint.sh" ]
+CMD ["mysqld", "nginx", "-g", "daemon off;"]

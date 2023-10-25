@@ -21,4 +21,3 @@ else
 fi
 echo
 echo "[ MySQL ] Configuration done"
-

@@ -20,10 +20,10 @@ then
     chmod +x wp-cli.phar
     mv wp-cli.phar /usr/local/bin/wp
     # TODO checksum
-    cd tmp && ls -l * && cd /
+    cd ./tmp && ls -l * && cd /
     # Import Static page
-    mv /tmp/src/* /$WP_PATH
+    mv ./tmp/src/* ./$WP_PATH
 fi
 
 # Start PHP
-exec /usr/sbin/php-fpm81 --nodaemonize
+exec ./usr/sbin/php-fpm81 --nodaemonize
