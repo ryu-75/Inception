@@ -76,7 +76,7 @@ then
     mkdir /run/php;
 fi
 
-touch /home/log.txt | ls -la /var/www/html/* > /home/log.txt
+# touch /home/log.txt | ls -la /var/www/html/* > /home/log.txt
 
 echo "========================================"
 echo "      Installation is complete.           "

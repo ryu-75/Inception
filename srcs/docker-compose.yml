@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
   nginx:
-    build: 
-      context: ./requirements/nginx/
+    build:
+      context: ./requirements/nginx
       dockerfile: ./Dockerfile
     container_name: nginx
     image: nginx:inception
@@ -20,42 +20,31 @@ services:
     depends_on:
       - wordpress
 
-  # mariadb:
-  #   container_name: mariadb
-  #   build:
-  #     context: ./requirements/mariadb/
-  #     dockerfile: ./Dockerfile
-  #   image: mariadb:inception
-  #   command: |
-  #     sh -c "echo 'Starting Commands' && \
-  #           apt-get update && \
-  #           apt-get install -y wget && \
-  #           wget https://downloads.mysql.com/docs/sakila-db.tar.gz && \
-  #           tar xzf sakila-db.tar.gz && \
-  #           echo 'Extraction Finished' && \
-  #           mv sakila-db/sakila-schema.sql /docker-entrypoint-initdb.d/1.sql && \
-  #           mv sakila-db/sakila-data.sql /docker-entrypoint-initdb.d/2.sql && \
-  #           echo 'Finished Commands' && \
-  #           docker-entrypoint.sh mysqld"
-  #   environment:
-  #     DB_ROOT_USER: ${DB_ROOT_USER}
-  #     DB_ROOT_PASS: ${DB_ROOT_PASS}
-  #     DB_DATABASE: ${DB_DATABASE}
-  #     DB_USER: ${DB_USER}
-  #     DB_PASS: ${DB_PASS}
-  #   env_file: .env
-  #   networks:
-  #     - inception
-  #   ports:
-  #     - "3306:3306"
-  #   restart: always
-  #   volumes:
-  #     - mariadb-data:/var/lib/mysql
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: ./Dockerfile
+    image: mariadb:inception
+    environment:
+      DB_ROOT_USER: ${DB_ROOT_USER}
+      DB_ROOT_PASS: ${DB_ROOT_PASS}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    env_file: .env
+    networks:
+      - inception
+    ports:
+      - "3306:3306"
+    restart: always
+    volumes:
+      - mariadb-data:/var/lib/mysql
 
   wordpress:
     container_name : wordpress
     build:
-      context : ./requirements/wordpress/
+      context : ./requirements/wordpress
       dockerfile: ./Dockerfile
     image: wordpress:inception
     env_file: .env
@@ -79,9 +68,9 @@ services:
       - "9000:9000"
     restart: always
     volumes:
-      - wordpress-data:/var/www/html/
-    # depends_on:
-    #   - mariadb
+      - wordpress-data:/var/www/html
+    depends_on:
+      - mariadb
 
 volumes:
   wordpress-data:
@@ -90,12 +79,12 @@ volumes:
       type : 'none'
       o: 'bind'
       device: /home/nlorion/data/wordpress-data
-  # mariadb-data:
-  #   driver: local
-  #   driver_opts:
-  #     type : 'none'
-  #     o: 'bind'
-  #     device: /home/nlorion/data/mariadb-data
+  mariadb-data:
+    driver: local
+    driver_opts:
+      type : 'none'
+      o: 'bind'
+      device: /home/nlorion/data/mariadb-data
 
 networks:
   inception:
