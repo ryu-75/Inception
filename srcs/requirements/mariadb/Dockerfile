@@ -1,27 +1,29 @@
 FROM	alpine:3.17
 
 # Installation de MariaDB
-RUN     apk update && apk upgrade &&\
+RUN     apk update && apk upgrade && \
 		apk add --no-cache \
-		mysql \
-		mysql-client \
+		bash \
 		openssl \
-		mariadb \
+		mysql \
 		mariadb-client \
-		openrc &&\
+		mysql-client \
+		gettext \
+		openrc && \
 		apk add --upgrade mysql-client
 
 # Copie les fichiers de configuration de MariaDB
-COPY    conf/mariadb-server.cnf etc/mysql/my.cnf.d
-COPY    tool/mariadb-config.sh /mariadb-config.sh
+COPY    conf/mariadb-server.conf /etc/mysql/my.cnf
+COPY	conf/script.sh /script.sh
+# COPY	conf/database.sql /database.sql
 
-# Importation du script d'initialisation
-RUN     mkdir /var/run/mysqld/ && \
-        chmod a+x /mariadb-config.sh
+# Creation du dossier sql
+RUN		mkdir /run/mysqld
+RUN		chmod a+x /script.sh
 
-EXPOSE	3306
+EXPOSE 3306
 
 # Lancement des configurations des scripts MariaDB entant que point d'entree
-ENTRYPOINT     [ "/mariadb-config.sh" ]
+ENTRYPOINT [ "/script.sh" ]
 
-# CMD ["mysqld", "nginx", "-g", "daemon off;"]
+# CMD ["mysqld", "--bind-address=0.0.0.0"]

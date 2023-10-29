@@ -7,19 +7,21 @@ RUN     apk update && apk upgrade &&\
         openssl \
         curl
 
-# Sauvegarder une copie de la configuration nginx
-COPY    conf/default.conf /etc/nginx/http.d/default.conf
-RUN     chmod +x /etc/nginx/http.d/default.conf
+RUN     mkdir -p /etc/nginx/ssl
+
 # OPENSSL
 # Generate SSL certificate and key
 RUN     openssl req -x509 -nodes -newkey rsa:4096 \
-        -keyout /etc/ssl/private/selfsigned-ssl.key \
-        -out /etc/ssl/certs/selfsigned-ssl.crt \
-        -sha256 -days 365 -subj "/C=FR/ST=IDF/L=Paris/O=42Network/OU=42Paris/CN=nlorion.42.fr"
+        -keyout /etc/nginx/ssl/inception-ssl.key \
+        -out /etc/nginx/ssl/inception-ssl.crt \
+        -sha256 -days 365 -subj "/C=FR/ST=IDF/L=Paris/O=42Network/OU=42Paris/CN=nlorion.42.fr" && \
+        mkdir -p /var/run/nginx
 
-EXPOSE  443/tcp
+# Sauvegarder une copie de la configuration nginx
+COPY    conf/default.conf /etc/nginx/default.conf
+RUN     chmod a+x /etc/nginx/nginx.conf
 
-# STOPSIGNAL SIGTERM
+EXPOSE  443
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
