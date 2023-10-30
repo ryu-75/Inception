@@ -40,6 +40,10 @@ cat database_copy.sql
 # Exécution de la commande MySQL avec le fichier database_new.sql
 mysqld --user=root --bootstrap < database_copy.sql
 
+# rc-service mariadb start
+# mysqladmin -u root password toor
+# mysql_upgrade --user=root --boostrap < database_copy.sql
+
 # Suppression des fichiers temporaires
 rm -f database.sql && rm -f database_copy.sql
 

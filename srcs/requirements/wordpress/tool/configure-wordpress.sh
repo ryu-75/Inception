@@ -6,16 +6,15 @@ echo "========================================"
 echo "          Installing Wordpress          "
 echo "========================================"
 echo
-if [ -d "/run/php/" ];
-then
-    echo "/run/php/ is already exist";
-fi
 # chown -R www-data:www-data /var/www/html/*
 chmod -R 755 /var/www/html/*
 mkdir -p /run/php/
+
 touch /run/php/php81-fpm.pid
+
 # Wait for the database
 sleep 10
+
 echo "Creating database configuration file..."
 echo "Installing wordpress core..."
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -38,7 +37,7 @@ wp user create $WP_USER_NAME $WP_USER_MAIL \
             --allow-root \
             --display_name=$WP_USER_NAME \
             --role=author \
-            --porcelain 
+            --porcelain
 echo "Installing wordpress theme..."
 wp theme install twentyseventeen \
             --activate \
