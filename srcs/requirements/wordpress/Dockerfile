@@ -15,6 +15,7 @@ RUN		apk update && apk upgrade && \
 				argon2-libs \
 				libedit \
 				libxml2 \
+				gettext \
 				musl \
 				pcre2 \
 				zlib && \

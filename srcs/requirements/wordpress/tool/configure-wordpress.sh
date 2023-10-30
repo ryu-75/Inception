@@ -32,22 +32,22 @@ else
                 --admin_email=$WP_ADMIN_MAIL \
                 --admin_password=$WP_ADMIN_PASS \
                 --path=/var/www/html/wordpress \
-                --skip_email \
+                --skip-email \
                 --allow-root
     echo "Creating wordpress default user..."
     wp user create \
                 --user_pass=$WP_USER_PASS \
-                --display_name=$WP_USER \
+                --display_name=$WP_USER_NAME \
                 --path=/var/www/html/wordpress \
                 --role=author $WP_USER_NAME $WP_USER_MAIL\
                 --porcelain \
                 --allow-root
     echo "Installing wordpress theme..."
-    wp theme install the-bootstrap-blog \
-                --path=/var/www/html/wordpress \
+    wp theme install twentyseventeen \
                 --activate \
+                --path=/var/www/html/wordpress \
                 --allow-root
-    wp theme status the-bootstrap-blog \
+    wp theme status twentyseventeen \
                 --allow-root
 fi
 

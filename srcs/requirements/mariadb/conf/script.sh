@@ -24,24 +24,24 @@ touch database.sql
 	echo "CREATE DATABASE IF NOT EXISTS ${DB_DATABASE};"
 	echo "USE ${DB_DATABASE};"
 	echo "FLUSH PRIVILEGES;"
-	echo "GRANT ALL ON *.* TO '${DB_ROOT_USER}'@'%' IDENTIFIED BY '${DB_ROOT_PASS}';"
-	echo "ALTER USER '${DB_ROOT_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
+	echo "GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '${DB_ROOT_PASS}';"
+	echo "ALTER USER 'root'@'%' IDENTIFIED BY '${DB_PASS}';"
 	echo "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
 	echo "GRANT ALL PRIVILEGES ON ${DB_DATABASE}.* TO '${DB_USER}'@'%';"
 	echo "FLUSH PRIVILEGES;"
 } > database.sql
 
 #Copie du contenu de database.sql vers database_new.sql
-envsubst < database.sql
+envsubst < database.sql > database_copy.sql
 # cp database.sql database_new.sql
 
+cat database_copy.sql
+
 # Exécution de la commande MySQL avec le fichier database_new.sql
-mysql -u root -p $DB_ROOT_PASS --database=$DB_DATABASE < database.sql
+mysqld --user=root --bootstrap < database_copy.sql
 
 # Suppression des fichiers temporaires
-rm -f database.sql
-
-# mysql_upgrade --user=root -p${$DB_ROOT_PASS}
+rm -f database.sql && rm -f database_copy.sql
 
 # Exécution de mysqld
-exec mysql -u root $@
+exec mysqld --user=root $@

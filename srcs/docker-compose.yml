@@ -1,6 +1,23 @@
 version: '3.9'
 
 services:
+  nginx:
+    build:
+      context: ./requirements/nginx
+      dockerfile: ./Dockerfile
+    container_name: nginx
+    image: nginx:inception
+    env_file: .env
+    networks:
+      - inception
+    ports:
+      - "443:443"
+    restart: always
+    volumes:
+      - wordpress-data:/var/www/html
+    depends_on:
+      - wordpress
+
   mariadb:
     container_name: mariadb
     build:
@@ -16,47 +33,30 @@ services:
     volumes:
       - mariadb-data:/var/lib/mysql
 
-  # nginx:
-  #   build:
-  #     context: ./requirements/nginx
-  #     dockerfile: ./Dockerfile
-  #   container_name: nginx
-  #   image: nginx:inception
-  #   env_file: .env
-  #   networks:
-  #     - inception
-  #   ports:
-  #     - "443:443"
-  #   restart: always
-  #   volumes:
-  #     - wordpress-data:/var/www/html
-  #   depends_on:
-  #     - wordpress
+  wordpress:
+    container_name : wordpress
+    build:
+      context : ./requirements/wordpress
+      dockerfile: ./Dockerfile
+    image: wordpress:inception
+    env_file: .env
+    networks:
+      - inception
+    ports:
+      - "9000:9000"
+    restart: always
+    volumes:
+      - wordpress-data:/var/www/html
+    depends_on:
+      - mariadb
 
-  # wordpress:
-  #   container_name : wordpress
-  #   build:
-  #     context : ./requirements/wordpress
-  #     dockerfile: ./Dockerfile
-  #   image: wordpress:inception
-  #   env_file: .env
-  #   networks:
-  #     - inception
-  #   expose:
-  #     - "9000"
-  #   restart: always
-  #   volumes:
-  #     - wordpress-data:/var/www/html
-  #   depends_on:
-  #     - mariadb
-
-  # wordpress-data:
-  #   driver: local
-  #   driver_opts:
-  #     type : bind
-  #     o: 'bind'
-  #     device: /home/nlorion/data/wordpress-data
 volumes:
+  wordpress-data:
+    driver: local
+    driver_opts:
+      type : bind
+      o: 'bind'
+      device: /home/nlorion/data/wordpress-data
   mariadb-data:
     driver: local
     driver_opts:
