@@ -16,6 +16,9 @@ else
 	echo "Folder is already exist"
 fi
 
+chown -R mysql:mysql /var/lib/mysql
+chown -R mysql:mysql /var/lib/mysql/*
+
 cd /var/lib/mysqld
 
 # Creation du fichier database.sql
@@ -25,7 +28,7 @@ touch database.sql
 	echo "USE ${DB_DATABASE};"
 	echo "FLUSH PRIVILEGES;"
 	echo "GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '${DB_ROOT_PASS}';"
-	echo "ALTER USER 'root'@'%' IDENTIFIED BY '${DB_PASS}';"
+	echo "ALTER USER 'root'@'%' IDENTIFIED BY '${DB_ROOT_PASS}';"
 	echo "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
 	echo "GRANT ALL PRIVILEGES ON ${DB_DATABASE}.* TO '${DB_USER}'@'%';"
 	echo "FLUSH PRIVILEGES;"
@@ -41,11 +44,11 @@ cat database_copy.sql
 mysqld --user=root --bootstrap < database_copy.sql
 
 # rc-service mariadb start
-# mysqladmin -u root password toor
-# mysql_upgrade --user=root --boostrap < database_copy.sql
+# mysqladmin --user=root $DB_ROOT_PASS
+# mysqld_upgrade --user=root --boostrap < database_copy.sql
 
 # Suppression des fichiers temporaires
 rm -f database.sql && rm -f database_copy.sql
 
 # Exécution de mysqld
-exec mysqld --user=root $@
+exec mysqld_safe --user=root $@

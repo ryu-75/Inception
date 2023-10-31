@@ -31,4 +31,6 @@ fclean			: 	clean
 					sudo rm -rf ${DATA_PATH}/data/mariadb-data
 					sudo rm -rf ${DATA_PATH}
 
-.PHONY			: 	all setup up start down delete stop clean fclean
+re				:	fclean up
+
+.PHONY			: 	all setup up re start restart down delete stop clean fclean

@@ -25,8 +25,10 @@ RUN		apk update && apk upgrade && \
 				rm wordpress-6.3.1.tar.gz
 
 # Configure PHP-fpm pour ecouter sur le port reseau de creation interne 9000
-COPY		/conf/www.conf /etc/php81/fpm/pool.d/
-COPY 		/src/wp-config.php /var/www/html/wordpress/wp-config.php
+# COPY		/conf/www.conf /etc/php81/fpm/pool.d/
+# COPY	/src/wp-config.php /var/www/html/wordpress/wp-config.php
+
+RUN			sed -i 's/listen = 127.0.0.1:9000/listen = wordpress:9000/' /etc/php81/php-fpm.d/www.conf
 
 # Copie du fichier de configuration Wordpress
 COPY	/tool/configure-wordpress.sh /configure-wordpress.sh
@@ -35,6 +37,6 @@ RUN		chmod a+x /configure-wordpress.sh
 EXPOSE	9000
 
 # Lance le fichier de configuration Wordpress au demarrage du conteneur
-ENTRYPOINT [ "/configure-wordpress.sh" ]
+# ENTRYPOINT [ "/configure-wordpress.sh" ]
 
-CMD ["/usr/sbin/php-fpm81", "--nodaemonize"]
+CMD ["sh", "/configure-wordpress.sh"]

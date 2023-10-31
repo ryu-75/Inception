@@ -7,7 +7,7 @@ echo "          Installing Wordpress          "
 echo "========================================"
 echo
 # chown -R www-data:www-data /var/www/html/*
-chmod -R 755 /var/www/html/*
+chmod -R 755 /var/www/html
 mkdir -p /run/php/
 
 touch /run/php/php81-fpm.pid
@@ -21,6 +21,17 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 cd /var/www/html/wordpress
+wp core download
+wp config create \
+            --dbname=$DB_DATABASE \
+            --dbuser=$DB_USER \
+            --dbpass=$DB_PASS \
+            --dbhost=mariadb:3306 \
+            --dbprefix=wp_ \
+            --path=/var/www/wordpress \
+            --allow-root \
+            --skip-check \
+            --force
 wp core install \
             --url=$NGINX_HOST \
             --title=$WP_TITLE \
@@ -34,10 +45,10 @@ echo "Creating wordpress default user..."
 wp user create $WP_USER_NAME $WP_USER_MAIL \
             --user_pass=$WP_USER_PASS \
             --path=/var/www/html/wordpress \
-            --allow-root \
-            --display_name=$WP_USER_NAME \
             --role=author \
-            --porcelain
+            --porcelain \
+            --allow-root \
+            --display_name=$WP_USER_NAME
 echo "Installing wordpress theme..."
 wp theme install twentyseventeen \
             --activate \
@@ -46,9 +57,10 @@ wp theme install twentyseventeen \
 wp theme status twentyseventeen \
             --allow-root
 
-exec "$@"
 echo
 echo "========================================"
 echo "      Installation is complete.           "
 echo "========================================"
 echo
+exec /usr/sbin/php-fpm81 -F
+# exec "$@"
