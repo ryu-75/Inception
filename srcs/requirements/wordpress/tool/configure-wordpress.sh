@@ -8,11 +8,11 @@ echo "========================================"
 echo
 # chown -R www-data:www-data /var/www/html/*
 chmod -R 755 /var/www/html
-mkdir -p /run/php/
 
+mkdir -p /run/php
 touch /run/php/php81-fpm.pid
 
-# Wait for the database
+echo "Waiting database"
 sleep 10
 
 echo "Creating database configuration file..."
@@ -21,46 +21,46 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 cd /var/www/html/wordpress
-wp core download
+# wp core download
+echo "Creating wordpress admin user..."
 wp config create \
+            --allow-root \
             --dbname=$DB_DATABASE \
             --dbuser=$DB_USER \
             --dbpass=$DB_PASS \
-            --dbhost=mariadb:3306 \
+            --dbhost=$DB_HOST:3306 \
             --dbprefix=wp_ \
-            --path=/var/www/wordpress \
-            --allow-root \
+            --path=/var/www/html/wordpress \
             --skip-check \
             --force
 wp core install \
+            --allow-root \
             --url=$NGINX_HOST \
             --title=$WP_TITLE \
             --admin_user=$WP_ADMIN_NAME \
             --admin_email=$WP_ADMIN_MAIL \
             --admin_password=$WP_ADMIN_PASS \
             --path=/var/www/html/wordpress \
-            --skip-email \
-            --allow-root
+            --skip-email
 echo "Creating wordpress default user..."
-wp user create $WP_USER_NAME $WP_USER_MAIL \
+wp user create  \
+            --allow-root \
             --user_pass=$WP_USER_PASS \
             --path=/var/www/html/wordpress \
-            --role=author \
+            --role=author $WP_USER_NAME $WP_USER_MAIL \
             --porcelain \
-            --allow-root \
             --display_name=$WP_USER_NAME
-echo "Installing wordpress theme..."
-wp theme install twentyseventeen \
-            --activate \
-            --path=/var/www/html/wordpress \
-            --allow-root
-wp theme status twentyseventeen \
-            --allow-root
+# echo "Installing wordpress theme..."
+# wp theme install twentyseventeen \
+#             --activate \
+#             --path=/var/www/html/wordpress \
+#             --allow-root
+# wp theme status twentyseventeen \
+#             --allow-root
 
 echo
 echo "========================================"
 echo "      Installation is complete.           "
 echo "========================================"
 echo
-exec /usr/sbin/php-fpm81 -F
-# exec "$@"
+exec /usr/sbin/php-fpm81 --nodaemonize -F
