@@ -1,9 +1,9 @@
 LOGIN			= 	nlorion
 DATA_PATH		= 	/home/${LOGIN}
 
-all				: 	up
+all				: 	setup up
 
-up				:	setup
+up				:
 					sudo docker compose -f srcs/docker-compose.yml up --build
 
 setup			:
@@ -31,6 +31,6 @@ fclean			: 	clean
 					sudo rm -rf ${DATA_PATH}/data/mariadb-data
 					sudo rm -rf ${DATA_PATH}
 
-re				:	fclean up
+re				:	fclean all
 
 .PHONY			: 	all setup up re start restart down delete stop clean fclean

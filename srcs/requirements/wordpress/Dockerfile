@@ -39,4 +39,6 @@ EXPOSE	9000
 # Lance le fichier de configuration Wordpress au demarrage du conteneur
 # ENTRYPOINT [ "/configure-wordpress.sh" ]
 
-CMD ["sh", "/configure-wordpress.sh"]
+ENTRYPOINT	["/configure-wordpress.sh"]
+
+CMD	["/usr/sbin/php-fpm81", "--nodaemonize", "-F"]
