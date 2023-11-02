@@ -11,17 +11,20 @@ RUN     apk update && apk upgrade && \
 		openrc && \
 		apk add --upgrade mysql-client
 
-RUN		mysql_install_db --user=root --datadir=/var/lib/mysql
+RUN		rm -rf /etc/mysql/my.cnf
 
 # Copie les fichiers de configuration de MariaDB
 COPY    conf/mariadb-server.conf /etc/mysql/my.cnf
 COPY	conf/script.sh /script.sh
 
 # Creation du dossier sql
-RUN		mkdir /run/mysqld
-RUN		chmod a+x /script.sh
+RUN		mkdir /run/mysqld && \
+		chmod +x /run/mysqld && \
+		chmod a+x /script.sh
+
+RUN		mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
 EXPOSE 3306
 
 # Lancement des configurations des scripts MariaDB entant que point d'entree
-ENTRYPOINT [ "/script.sh" ]
+CMD ["sh", "/script.sh" ]

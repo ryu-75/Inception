@@ -1,4 +1,0 @@
-{
-    "docker.dockerPath": "/var/lib/docker",
-    "docker.composeCommand": "/usr/libexec/docker/cli-plugins/docker-compose"
-}

@@ -21,7 +21,6 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 cd /var/www/html/wordpress
-# wp core download
 if [ ! -f /var/www/html/wordpress/wp-config.php ];
 then
     echo "Creating wp-config.php"
@@ -30,47 +29,44 @@ then
                 --dbname=$DB_DATABASE \
                 --dbuser=$DB_USER \
                 --dbpass=$DB_PASS \
-                --dbhost=$DB_HOST:3306 \
+                --dbhost=$DB_HOST \
                 --dbprefix=wp_ \
                 --path=/var/www/html/wordpress \
                 --skip-check \
                 --force
-fi
-if [ ! -f /var/www/html/wordpress/admin.php ];
-then
-    echo "Creating wordpress admin user..."
-    wp core install \
-                --allow-root \
-                --url=$NGINX_HOST \
-                --title=$WP_TITLE \
-                --admin_user=$WP_ADMIN_NAME \
-                --admin_email=$WP_ADMIN_MAIL \
-                --admin_password=$WP_ADMIN_PASS \
-                --path=/var/www/html/wordpress \
-                --skip-email
 else
-    echo "admin user already exist"
+    echo "wp-config is already exists."
 fi
-if [ ! -f /var/www/html/wordpress/user.php ];
+
+echo "Creating wordpress admin user..."
+wp core install \
+            --allow-root \
+            --url=$NGINX_HOST \
+            --title=$WP_TITLE \
+            --admin_user=$WP_ADMIN_NAME \
+            --admin_email=$WP_ADMIN_MAIL \
+            --admin_password=$WP_ADMIN_PASS \
+            --path=/var/www/html/wordpress \
+            --skip-email
+
+if wp user list --allow-root | grep -q "\<$WP_USER_NAME\>";
 then
-    echo "Creating wordpress default user..."
-    wp user create  \
-                --allow-root \
-                --display_name=$WP_USER_NAME \
-                --user_pass=$WP_USER_PASS \
-                --role=author $WP_USER_NAME $WP_USER_MAIL \
-                --path=/var/www/html/wordpress \
-                --porcelain
+    echo "Default user already exists."
 else
-    echo "default user already exist"
+    echo "Creating WordPress default user..."
+    if wp user create \
+        --allow-root \
+        --display_name=$WP_USER_NAME \
+        --user_pass=$WP_USER_PASS \
+        --role=author $WP_USER_NAME $WP_USER_MAIL \
+        --path=/var/www/html/wordpress \
+        --porcelain | grep -q "Error";
+    then
+        echo "Error creating default user."
+    else
+        echo "Default user created."
+    fi
 fi
-# echo "Installing wordpress theme..."
-# wp theme install twentyseventeen \
-#             --activate \
-#             --path=/var/www/html/wordpress \
-#             --allow-root
-# wp theme status twentyseventeen \
-#             --allow-root
 
 echo
 echo "========================================"

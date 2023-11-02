@@ -4,7 +4,7 @@ DATA_PATH		= 	/home/${LOGIN}
 all				: 	setup up
 
 up				:
-					sudo docker compose -f srcs/docker-compose.yml up --build
+					sudo docker compose -f srcs/docker-compose.yml up
 
 setup			:
 					sudo mkdir ${DATA_PATH}
